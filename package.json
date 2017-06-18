@@ -5,9 +5,9 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
+    "start": "npm run server",
     "server": "nodemon -w src/server --exec \"babel-node src/server\"",
-    "build:react": "webpack -d --watch -p --progress"
+    "build": "webpack -d --watch -p --progress"
   },
   "author": "",
   "license": "ISC",
