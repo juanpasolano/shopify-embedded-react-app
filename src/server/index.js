@@ -19,7 +19,7 @@ app.use(express.static(`${__dirname}/../public`))
 
 // Shopify Authentication
 app.get('/install', (req, res)=> {
-  res.render(`${__dirname}/../public/install`)
+  res.render(`${__dirname}/install`)
 })
 
 // This function initializes the Shopify OAuth Process
@@ -31,7 +31,7 @@ app.get('/shopify_auth', (req, res) => {
     const nonce = shopifyToken.generateNonce();
     const scopes = 'read_products,read_customers,read_orders'
     const authUrl = shopifyToken.generateAuthUrl(shop, scopes, nonce)
-    res.render(`${__dirname}/../public/redirect`, { authUrl })
+    res.render(`${__dirname}/redirect`, { authUrl })
   } else {
     res.status(400).send('Bad request: No shop param specified')
   }
@@ -57,7 +57,7 @@ app.get('/callback', (req, res) => {
 app.get('/', (req, res) => {
   console.log(req.session)
   if (req.session.token) {
-    res.render(`${__dirname}/../public/index`, {
+    res.render(`${__dirname}/index`, {
       apiKey: process.env.SHOPIFY_APP_API_KEY,
       shopOrigin: req.session.shop
     })
