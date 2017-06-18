@@ -1,0 +1,100 @@
+@mixin spacer-loop($sufix: "") {
+  @for $i from 0 through 20 {
+    .spacer-#{$i}#{$sufix} {
+      width: 100%;
+      clear: both;
+      height: 10px*$i;
+    }
+    .m-v-#{$i}#{$sufix} {
+      margin-top: 10px*$i;
+      margin-bottom: 10px*$i;
+    }
+    .m-h-#{$i}#{$sufix} {
+      margin-left: 10px*$i;
+      margin-right: 10px*$i;
+    }
+    .m-#{$i}#{$sufix} {
+      margin: 10px*$i;
+    }
+    .m-t-#{$i}#{$sufix} {
+      margin-top: 10px*$i;
+    }
+    .m-b-#{$i}#{$sufix} {
+      margin-bottom: 10px*$i;
+    }
+    .m-r-#{$i}#{$sufix} {
+      margin-right: 10px*$i;
+    }
+    .m-l-#{$i}#{$sufix} {
+      margin-left: 10px*$i;
+    }
+    .p-#{$i}#{$sufix} {
+      padding: 10px*$i;
+    }
+    .p-v-#{$i}#{$sufix} {
+      padding-top: 10px*$i;
+      padding-bottom: 10px*$i;
+    }
+    .p-h-#{$i}#{$sufix} {
+      padding-left: 10px*$i;
+      padding-right: 10px*$i;
+    }
+    .p-t-#{$i}#{$sufix} {
+      padding-top: 10px*$i;
+    }
+    .p-b-#{$i}#{$sufix} {
+      padding-bottom: 10px*$i;
+    }
+    .p-r-#{$i}#{$sufix} {
+      padding-right: 10px*$i;
+    }
+    .p-l-#{$i}#{$sufix} {
+      padding-left: 10px*$i;
+    }
+
+    //Negatives
+    .m-v-n-#{$i}#{$sufix} {
+      margin-top: -10px*$i;
+      margin-bottom: -10px*$i;
+    }
+    .m-h-n-#{$i}#{$sufix} {
+      margin-left: -10px*$i;
+      margin-right: -10px*$i;
+    }
+    .m-n-#{$i}#{$sufix} {
+      margin: -10px*$i;
+    }
+    .m-t-n-#{$i}#{$sufix} {
+      margin-top: -10px*$i;
+    }
+    .m-b-n-#{$i}#{$sufix} {
+      margin-bottom: -10px*$i;
+    }
+    .m-r-n-#{$i}#{$sufix} {
+      margin-right: -10px*$i;
+    }
+    .m-l-n-#{$i}#{$sufix} {
+      margin-left: -10px*$i;
+    }
+  }
+}
+@include spacer-loop(); 
+/* Small devices (mobile, 768px and low) */
+@media (max-width: 768px) {
+  @include spacer-loop("-xs"); 
+}
+
+/* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  @include spacer-loop("-sm"); 
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  @include spacer-loop("-md"); 
+}
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) { 
+  @include spacer-loop("-lg"); 
+}
