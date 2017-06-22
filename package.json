@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run build; npm run server",
+    "start": "npm run server",
     "server": "node ./dist/src/server/index.js",
     "server:local": "nodemon -w src/server --exec \"babel-node src/server\"",
     "build": "babel src/server/index.js -d dist",
@@ -27,7 +27,9 @@
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-router-dom": "^4.1.1",
-    "session-file-store": "^1.0.0"
+    "session-file-store": "^1.0.0",
+    "babel-cli": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
