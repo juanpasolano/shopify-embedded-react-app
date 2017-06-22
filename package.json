@@ -5,12 +5,12 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run server",
+    "start": "npm run build; npm run server",
     "server": "node dist/src/server/index.js",
     "server:local": "nodemon -w src/server --exec \"babel-node src/server\"",
     "build": "babel src/server/index.js -d dist",
     "webpack:watch": "webpack -d --watch -p --progress",
-    "webpack": "webpack -d --watch -p --progress",
+    "webpack": "webpack -d -p --progress",
     "dev": "npm run server; npm run webpack:watch"
   },
   "author": "",
@@ -33,7 +33,9 @@
     "babel-preset-stage-0": "^6.24.1",
     "babel-core": "^6.25.0",
     "babel-loader": "^7.0.0",
-    "babel-preset-react": "^6.24.1"
+    "babel-preset-react": "^6.24.1",
+    "shopify-api-node": "^2.6.0",
+    "shopify-token": "^3.0.1"
   },
   "devDependencies": {
     "css-loader": "^0.28.4",
@@ -41,8 +43,6 @@
     "node-sass": "^4.5.3",
     "nodemon": "^1.11.0",
     "sass-loader": "^6.0.6",
-    "shopify-api-node": "^2.6.0",
-    "shopify-token": "^3.0.1",
     "style-loader": "^0.18.2",
     "webpack": "^2.6.1"
   }
