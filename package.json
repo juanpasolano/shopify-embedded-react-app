@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run server",
-    "server": "node ./dist/src/server/index.js",
+    "server": "node dist/src/server/index.js",
     "server:local": "nodemon -w src/server --exec \"babel-node src/server\"",
     "build": "babel src/server/index.js -d dist",
     "webpack:watch": "webpack -d --watch -p --progress",
