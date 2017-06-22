@@ -1,8 +1,13 @@
 require('dotenv').config({path: path.resolve(`${__dirname}/../../.env`)})
 import express from 'express';
-import session from 'express-session'
+import session from 'express-session';
 import path from 'path';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+import logger from 'morgan';
 import ShopifyToken from 'shopify-token';
+import Shop from './shop';
+var FileStore = require('session-file-store')(session);
 
 const shopifyToken = new ShopifyToken({
   apiKey: process.env.SHOPIFY_APP_API_KEY,
@@ -14,24 +19,37 @@ const shopifyToken = new ShopifyToken({
 let app =  express();
 app.set('view engine', 'ejs');
 
-app.use(session({secret: 'keyboard cat'}));
+
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(session({
+  store: new FileStore({
+    reapInterval: -1,
+  }),
+  secret: 'keyboard cat',
+  resave:false,
+  saveUninitialized:false
+}));
 app.use(express.static(`${__dirname}/../public`))
 
 // Shopify Authentication
 app.get('/install', (req, res)=> {
-  res.render(`${__dirname}/install`)
+  console.log(process.env.SHOPIFY_APP_SCOPES)
+  res.render(`${__dirname}/views/install`)
 })
 
 // This function initializes the Shopify OAuth Process
 // The template in views/embedded_app_redirect.ejs is rendered 
 app.get('/shopify_auth', (req, res) => {
   const shop = req.query.shop;
-  req.session.shop = req.query.shop;
   if(shop){
+    req.session.shop = req.query.shop;
     const nonce = shopifyToken.generateNonce();
-    const scopes = 'read_products,read_customers,read_orders'
+    const scopes = process.env.SHOPIFY_APP_SCOPES
     const authUrl = shopifyToken.generateAuthUrl(shop, scopes, nonce)
-    res.render(`${__dirname}/redirect`, { authUrl })
+    res.render(`${__dirname}/views/redirect`, { authUrl })
   } else {
     res.status(400).send('Bad request: No shop param specified')
   }
@@ -57,7 +75,13 @@ app.get('/callback', (req, res) => {
 app.get('/', (req, res) => {
   console.log(req.session)
   if (req.session.token) {
-    res.render(`${__dirname}/index`, {
+
+    const shop = new Shop(req.session.shop,req.session.token);
+    //shop.addWebhook()
+
+    shop.addScriptTag()
+
+    res.render(`${__dirname}/views/index`, {
       apiKey: process.env.SHOPIFY_APP_API_KEY,
       shopOrigin: req.session.shop
     })
@@ -66,6 +90,16 @@ app.get('/', (req, res) => {
   }
 })
 
+app.post('/webhook/:hook', (req, res) => {
+  console.log(req.body)
+  res.status(200).send('ok')
+})
+
+app.get('/proxy/products/', (req, res) => {
+  console.log(req.session)
+  res.set('Content-Type', 'application/liquid');
+  res.render(`${__dirname}/views/proxy`)
+})
 
 const PORT = process.env.PORT || 3000; 
 app.listen(PORT, ()=>{
