@@ -37,6 +37,7 @@ app.use(express.static(`${__dirname}/../public`))
 // Shopify Authentication
 app.get('/install', (req, res)=> {
   console.log(process.env.SHOPIFY_APP_SCOPES)
+  console.log(__dirname);
   res.render(`${__dirname}/views/install.ejs`)
 })
 
