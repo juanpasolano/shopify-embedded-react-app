@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run server",
     "server": "nodemon -w src/server --exec \"babel-node src/server\"",
-    "build": "webpack -d --watch -p --progress"
+    "build": "babel src/server/index.js -d dist",
+    "webpack:watch": "webpack -d --watch -p --progress",
+    "webpack": "webpack -d --watch -p --progress"
   },
   "author": "",
   "license": "ISC",
