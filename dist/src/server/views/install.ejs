@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Install App</title>
+    <link rel="stylesheet" href="https://sdks.shopifycdn.com/polaris/1.0.2/polaris.css">
+    <style>
+      .p-3 {
+        padding: 30px;
+      }
+    </style>
+</head>
+<body>
+    <div class="p-3">
+      <div class="Polaris-Layout">
+        <div class="Polaris-Layout__Section">
+          <div class="Polaris-Card">
+            <div class="Polaris-Card__Header">
+                <h2 class="Polaris-Heading">Install the app</h2>
+            </div>
+            <form action="/shopify_auth" method="GET">
+              <div class="Polaris-Card__Section">
+                <div class="Polaris-FormLayout">
+                  <div class="Polaris-FormLayout__Item">
+                    <div class="">
+                      <div class="Polaris-Labelled__LabelWrapper">
+                        <div class="Polaris-Label">
+                          <label  for="shop" class="Polaris-Label__Text">Store name</label>
+                        </div>
+                      </div>
+                      <div class="Polaris-TextField">
+                        <input name="shop" id="shop" value="" placeholder="my-owesome-store" class="Polaris-TextField__Input" aria-labelledby="shopLabel shopSuffix" aria-invalid="false">
+                        <div class="Polaris-TextField__Suffix" id="shopSuffix">.myshopify.com</div>
+                        <div class="Polaris-TextField__Backdrop"></div>
+                      </div>
+                  </div>
+                  </div>
+                  <div class="Polaris-FormLayout__Item">
+                    <button type="submit" class="Polaris-Button Polaris-Button--primary Polaris-Button--sizeLarge"><span class="Polaris-Button__Content"><span>Install</span></span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+  </div>
+</body>
+</html>
