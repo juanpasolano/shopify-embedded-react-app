@@ -4,5 +4,6 @@ Simple express app with oauth flow for Shopify embedded app. The embedded app it
 
 - npm install
 - change file example.env to .env and populate your variables
-- npm start
-- After install you can use [ngrok](https://ngrok.com/) to tunnel your localhost
+- `npm start`to start the express server
+- `npm run build` to bundle and watch react
+- After this, you can use [ngrok](https://ngrok.com/) to tunnel your localhost
