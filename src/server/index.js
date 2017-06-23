@@ -17,6 +17,7 @@ const shopifyToken = new ShopifyToken({
 
 
 let app =  express();
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 
@@ -36,7 +37,7 @@ app.use(express.static(`./../public`))
 
 // Shopify Authentication
 app.get('/install', (req, res)=> {
-  res.render(`./views/install.ejs`)
+  res.render(`install`)
 })
 
 // This function initializes the Shopify OAuth Process
@@ -48,7 +49,7 @@ app.get('/shopify_auth', (req, res) => {
     const nonce = shopifyToken.generateNonce();
     const scopes = process.env.SHOPIFY_APP_SCOPES
     const authUrl = shopifyToken.generateAuthUrl(shop, scopes, nonce)
-    res.render(`./views/redirect.ejs`, { authUrl })
+    res.render(`redirect`, { authUrl })
   } else {
     res.status(400).send('Bad request: No shop param specified')
   }
@@ -80,7 +81,7 @@ app.get('/', (req, res) => {
 
     shop.addScriptTag()
 
-    res.render(`./views/index.ejs`, {
+    res.render(`index`, {
       apiKey: process.env.SHOPIFY_APP_API_KEY,
       shopOrigin: req.session.shop
     })
@@ -97,7 +98,7 @@ app.post('/webhook/:hook', (req, res) => {
 app.get('/proxy/products/', (req, res) => {
   console.log(req.session)
   res.set('Content-Type', 'application/liquid');
-  res.render(`./views/proxy.ejs`)
+  res.render(`proxy`)
 })
 
 const PORT = process.env.PORT || 3000; 
