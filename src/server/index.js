@@ -8,7 +8,6 @@ import logger from 'morgan';
 import ShopifyToken from 'shopify-token';
 import Shop from './shop';
 var FileStore = require('session-file-store')(session);
-import mongoose from 'mongoose';
 
 //Setting up Shopify App Credentials
 const shopifyToken = new ShopifyToken({
@@ -18,22 +17,8 @@ const shopifyToken = new ShopifyToken({
 })
 
 //Mongodb/Mongoose
-const mongoDb = 
-  process.env.MONGODB_URI ||
-  'mongodb://localhost/shopify-app';
-
-mongoose.Promise = global.Promise;
-mongoose.connect(mongoDb);
-var Cat = mongoose.model('Cat', { name: String });
-
-var kitty = new Cat({ name: 'Zildjian' });
-kitty.save(function (err) {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log('meow');
-  }
-});
+import db from './db';
+console.log(db)
 
 
 //The express app
