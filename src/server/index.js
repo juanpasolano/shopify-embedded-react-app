@@ -8,17 +8,36 @@ import logger from 'morgan';
 import ShopifyToken from 'shopify-token';
 import Shop from './shop';
 var FileStore = require('session-file-store')(session);
+import mongoose from 'mongoose';
 
+//Setting up Shopify App Credentials
 const shopifyToken = new ShopifyToken({
   apiKey: process.env.SHOPIFY_APP_API_KEY,
   sharedSecret: process.env.SHOPIFY_APP_SECRET,
   redirectUri: process.env.SHOPIFY_REDIRECT_URI,
 })
 
-console.log('__dirname-----------------');
-console.log(__dirname);
+//Mongodb/Mongoose
+const mongoDb = 
+  process.env.MONGOLAB_URI ||
+  process.env.MONGOHQ_URL ||
+  'mongodb://localhost/shopify-app';
+
+mongoose.Promise = global.Promise;
+mongoose.connect(mongoDb);
+var Cat = mongoose.model('Cat', { name: String });
+
+var kitty = new Cat({ name: 'Zildjian' });
+kitty.save(function (err) {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log('meow');
+  }
+});
 
 
+//The express app
 let app =  express();
 app.set('view engine', 'ejs');
 
