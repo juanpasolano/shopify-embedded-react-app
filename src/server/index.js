@@ -1,4 +1,4 @@
-require('dotenv').config({path: path.resolve(`${__dirname}/../../.env`)})
+require('dotenv').config({path: path.resolve(`./../../.env`)})
 import express from 'express';
 import session from 'express-session';
 import path from 'path';
@@ -32,16 +32,11 @@ app.use(session({
   resave:false,
   saveUninitialized:false
 }));
-app.use(express.static(`${__dirname}/../public`))
+app.use(express.static(`./../public`))
 
 // Shopify Authentication
 app.get('/install', (req, res)=> {
-  console.log(process.env.SHOPIFY_APP_SCOPES)
-  console.log('__dirname-----------------');
-  console.log(__dirname);
-  console.log('process.env-----------------');
-  console.log(process.env);
-  res.render(`${__dirname}/views/install.ejs`)
+  res.render(`./views/install.ejs`)
 })
 
 // This function initializes the Shopify OAuth Process
@@ -53,7 +48,7 @@ app.get('/shopify_auth', (req, res) => {
     const nonce = shopifyToken.generateNonce();
     const scopes = process.env.SHOPIFY_APP_SCOPES
     const authUrl = shopifyToken.generateAuthUrl(shop, scopes, nonce)
-    res.render(`${__dirname}/views/redirect.ejs`, { authUrl })
+    res.render(`./views/redirect.ejs`, { authUrl })
   } else {
     res.status(400).send('Bad request: No shop param specified')
   }
@@ -85,7 +80,7 @@ app.get('/', (req, res) => {
 
     shop.addScriptTag()
 
-    res.render(`${__dirname}/views/index.ejs`, {
+    res.render(`./views/index.ejs`, {
       apiKey: process.env.SHOPIFY_APP_API_KEY,
       shopOrigin: req.session.shop
     })
@@ -102,7 +97,7 @@ app.post('/webhook/:hook', (req, res) => {
 app.get('/proxy/products/', (req, res) => {
   console.log(req.session)
   res.set('Content-Type', 'application/liquid');
-  res.render(`${__dirname}/views/proxy.ejs`)
+  res.render(`./views/proxy.ejs`)
 })
 
 const PORT = process.env.PORT || 3000; 
