@@ -7,7 +7,6 @@ mongoose.connect(mongoDb);
 const Products =  mongoose.model('Products', new Schema({
   shopifyId: String,
   data: Schema.Types.Mixed,
-  _slider: { type: Schema.Types.ObjectId, ref: 'Sliders' },
 }));
 
 const Sliders =  mongoose.model('Sliders', new Schema({

@@ -20,7 +20,6 @@ apiRouter.route('/sliders')
           const newProduct = new db.Products({
             data: product,
             shopifyId: product.id,
-            _slider: slider._id
           })
           newProduct.save()
           slider.products.push(newProduct)

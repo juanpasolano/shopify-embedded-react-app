@@ -65,8 +65,6 @@ app.get('/callback', (req, res) => {
       req.session.token = token;
 
       const shop = new Shop(req.session.shopName, req.session.token);
-      shop.addWebhook('products-changes', 'products/create')
-      shop.addWebhook('products-delete', 'products/delete')
       shop.addWebhook('products-update', 'products/update')
 
       res.redirect('/');
@@ -88,12 +86,19 @@ app.get('/', (req, res) => {
 })
 
 app.post('/webhook/:hook', (req, res) => {
-  console.log(req.body)
-  res.status(200).send('ok')
+  if(req.params.hook === 'products-update') {
+    db.Products.update({shopifyId: req.body.id}, {data:req.body}, (err, product)=> {
+      if(err){
+        res.status(400).send('ok')
+      }else {
+        res.status(200).send(product)
+      }
+    })
+  }else {
+    res.status(200).send('ok')
+  }
 })
-
 app.get('/proxy/products/', (req, res) => {
-  console.log(req.session)
   res.set('Content-Type', 'application/liquid');
   res.render(`${__dirname}/views/proxy.ejs`)
 })
