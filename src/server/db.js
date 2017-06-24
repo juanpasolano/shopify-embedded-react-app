@@ -5,18 +5,20 @@ mongoose.Promise = global.Promise;
 mongoose.connect(mongoDb);
 
 const Products =  mongoose.model('Products', new Schema({
-  productId: String,
-  data: [Schema.Types.Mixed]
+  shopifyId: String,
+  data: Schema.Types.Mixed,
+  _slider: { type: Schema.Types.ObjectId, ref: 'Sliders' },
 }));
 
 const Sliders =  mongoose.model('Sliders', new Schema({
   name: String,
-  porducts: [String],
-  shopId: [String]
+  products: [{ type: Schema.Types.ObjectId, ref: 'Products' }],
+  shopName: String
 }));
+
 const Shops =  mongoose.model('Shops', new Schema({
-  name: String,
-  porducts: [String]
+  shopName: String,
+  products: [String]
 }));
 
 
@@ -24,6 +26,7 @@ const db = {
   Products,
   Sliders,
   Shops,
+  mongoose,
 }
 
 export default db;

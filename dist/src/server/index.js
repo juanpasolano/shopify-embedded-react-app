@@ -32,21 +32,32 @@ var _shop = require('./shop');
 
 var _shop2 = _interopRequireDefault(_shop);
 
+var _db = require('./db');
+
+var _db2 = _interopRequireDefault(_db);
+
+var _shopifyApiNode = require('shopify-api-node');
+
+var _shopifyApiNode2 = _interopRequireDefault(_shopifyApiNode);
+
+var _api = require('./api');
+
+var _api2 = _interopRequireDefault(_api);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 require('dotenv').config({ path: _path2.default.resolve(__dirname + '/../../.env') });
 
-var FileStore = require('session-file-store')(_expressSession2.default);
+var MongoStore = require('connect-mongo')(_expressSession2.default);
 
+//Setting up Shopify App Credentials
 var shopifyToken = new _shopifyToken2.default({
   apiKey: process.env.SHOPIFY_APP_API_KEY,
   sharedSecret: process.env.SHOPIFY_APP_SECRET,
   redirectUri: process.env.SHOPIFY_REDIRECT_URI
 });
 
-console.log('__dirname-----------------');
-console.log(__dirname);
-
+//The express app
 var app = (0, _express2.default)();
 app.set('view engine', 'ejs');
 
@@ -55,9 +66,7 @@ app.use(_bodyParser2.default.json());
 app.use(_bodyParser2.default.urlencoded({ extended: false }));
 app.use((0, _cookieParser2.default)());
 app.use((0, _expressSession2.default)({
-  store: new FileStore({
-    reapInterval: -1
-  }),
+  store: new MongoStore({ mongooseConnection: _db2.default.mongoose.connection }),
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: false
@@ -74,7 +83,7 @@ app.use(_express2.default.static(__dirname + '/../public')
 );app.get('/shopify_auth', function (req, res) {
   var shop = req.query.shop;
   if (shop) {
-    req.session.shop = req.query.shop;
+    req.session.shopName = shop;
     var nonce = shopifyToken.generateNonce();
     var scopes = process.env.SHOPIFY_APP_SCOPES;
     var authUrl = shopifyToken.generateAuthUrl(shop, scopes, nonce);
@@ -88,11 +97,14 @@ app.use(_express2.default.static(__dirname + '/../public')
 // Shopify provides the app the is authorization_code, which is exchanged for an access token
 );app.get('/callback', function (req, res) {
   var verified = shopifyToken.verifyHmac(req.query);
-  console.log(verified);
   if (verified) {
     shopifyToken.getAccessToken(req.query.shop, req.query.code).then(function (token) {
+      console.log('lets get the token');
       req.session.token = token;
-      console.log(req.session);
+
+      var shop = new _shop2.default(req.session.shopName, req.session.token);
+      shop.addWebhook('/products-changes', 'products/create, products/delete, products/update');
+
       res.redirect('/');
     }).catch(function (err) {
       return console.err(err);
@@ -102,18 +114,37 @@ app.use(_express2.default.static(__dirname + '/../public')
 
 // React
 //The react app handles the rest of the urls
-);app.get('/', function (req, res) {
-  console.log(req.session);
+);
+app.get('/', function (req, res) {
   if (req.session.token) {
 
-    var shop = new _shop2.default(req.session.shop, req.session.token);
-    //shop.addWebhook()
+    //const shop = new Shop(req.session.shopName, req.session.token);
+    //shop.addWebhook('/products-changes', 'products/create, products/delete, products/update')
 
-    shop.addScriptTag();
+    console.log(req.session);
+    var shopify = new _shopifyApiNode2.default({
+      shopName: req.session.shopName,
+      accessToken: req.session.token
+    });
+
+    if (process.env.BASE_URL) {
+      var address = process.env.BASE_URL + 'webhook//products-changes';
+      shopify.webhook.create({
+        "webhook": {
+          "topic": "orders/create",
+          "address": "http://whatever.hostname.com/",
+          "format": "json"
+        }
+      }).then(function (res) {
+        return console.log(res);
+      }).catch(function (err) {
+        return console.error(err);
+      });
+    }
 
     res.render(__dirname + '/views/index.ejs', {
       apiKey: process.env.SHOPIFY_APP_API_KEY,
-      shopOrigin: req.session.shop
+      shopName: req.session.shopName
     });
   } else {
     res.redirect('/install');
@@ -130,6 +161,8 @@ app.get('/proxy/products/', function (req, res) {
   res.set('Content-Type', 'application/liquid');
   res.render(__dirname + '/views/proxy.ejs');
 });
+
+app.use('/api', _api2.default);
 
 var PORT = process.env.PORT || 3000;
 app.listen(PORT, function () {

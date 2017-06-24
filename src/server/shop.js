@@ -1,17 +1,20 @@
 import Shopify from 'shopify-api-node';
 
-function Shop(shop, token) {
-  this.shop = shop;
+function Shop(shopName, token) {
+  this.shopName = shopName;
   this.token = token;
   this.shopify = new Shopify({
-    shopName: this.shop,
+    shopName: this.shopName,
     accessToken: this.token
   })
-  this.addWebhook = () => {
+
+  //path ie '/products-create'
+  //topic ie 'products/create'
+  this.addWebhook = (path, topic) => {
     if (process.env.BASE_URL){
-      const address = `${process.env.BASE_URL}webhook/products-create`
+      const address = `${process.env.BASE_URL}webhook/${path}`
       return this.shopify.webhook.create({ 
-        topic: 'products/create',
+        topic: topic,
         address
       }).then(res => console.log(res))
         .catch(err => console.error(err));

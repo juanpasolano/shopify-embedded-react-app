@@ -12,10 +12,12 @@
     <script type="text/javascript">
         window.shopSession = {
             apiKey: '<%= apiKey %>',
-            shopOrigin: '<% if (shopOrigin) { %>https://<%= shopOrigin %>.myshopify.com<% } %>'
+            shopOrigin: '<% if (shopName) { %>https://<%= shopName %>.myshopify.com<% } %>',
+            shopName: '<% if (shopName) { %><%= shopName %><% } %>'
         };
     </script>
     <script src="https://res.cloudinary.com/dp2g0poix/raw/upload/v1497820231/vendor.bundle_zstvf2.js"></script>
+    <!--<script src="/vendor.bundle.js"></script>-->
     <script src="/bundle.js"></script>
 </body>
 </html>

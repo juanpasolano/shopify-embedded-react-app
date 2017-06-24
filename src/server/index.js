@@ -7,7 +7,8 @@ import bodyParser from 'body-parser';
 import logger from 'morgan';
 import ShopifyToken from 'shopify-token';
 import Shop from './shop';
-var FileStore = require('session-file-store')(session);
+import db from './db';
+const MongoStore = require('connect-mongo')(session);
 
 //Setting up Shopify App Credentials
 const shopifyToken = new ShopifyToken({
@@ -15,11 +16,6 @@ const shopifyToken = new ShopifyToken({
   sharedSecret: process.env.SHOPIFY_APP_SECRET,
   redirectUri: process.env.SHOPIFY_REDIRECT_URI,
 })
-
-//Mongodb/Mongoose
-import db from './db';
-console.log(db)
-
 
 //The express app
 let app =  express();
@@ -31,9 +27,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
-  store: new FileStore({
-    reapInterval: -1,
-  }),
+  store: new MongoStore({ mongooseConnection: db.mongoose.connection }),
   secret: 'keyboard cat',
   resave:false,
   saveUninitialized:false
@@ -50,7 +44,7 @@ app.get('/install', (req, res)=> {
 app.get('/shopify_auth', (req, res) => {
   const shop = req.query.shop;
   if(shop){
-    req.session.shop = req.query.shop;
+    req.session.shopName = shop;
     const nonce = shopifyToken.generateNonce();
     const scopes = process.env.SHOPIFY_APP_SCOPES
     const authUrl = shopifyToken.generateAuthUrl(shop, scopes, nonce)
@@ -65,11 +59,15 @@ app.get('/shopify_auth', (req, res) => {
 // Shopify provides the app the is authorization_code, which is exchanged for an access token
 app.get('/callback', (req, res) => {
   const verified = shopifyToken.verifyHmac(req.query);
-  console.log(verified)
   if(verified){
     shopifyToken.getAccessToken(req.query.shop, req.query.code).then((token) => {
       req.session.token = token;
-      console.log(req.session)
+
+      const shop = new Shop(req.session.shopName, req.session.token);
+      shop.addWebhook('products-changes', 'products/create')
+      shop.addWebhook('products-delete', 'products/delete')
+      shop.addWebhook('products-update', 'products/update')
+
       res.redirect('/');
     }).catch((err) => console.err(err));
   }
@@ -78,17 +76,10 @@ app.get('/callback', (req, res) => {
 // React
 //The react app handles the rest of the urls
 app.get('/', (req, res) => {
-  console.log(req.session)
   if (req.session.token) {
-
-    const shop = new Shop(req.session.shop,req.session.token);
-    //shop.addWebhook()
-
-    shop.addScriptTag()
-
     res.render(`${__dirname}/views/index.ejs`, {
       apiKey: process.env.SHOPIFY_APP_API_KEY,
-      shopOrigin: req.session.shop
+      shopName: req.session.shopName
     })
   } else {
     res.redirect('/install');
@@ -105,6 +96,9 @@ app.get('/proxy/products/', (req, res) => {
   res.set('Content-Type', 'application/liquid');
   res.render(`${__dirname}/views/proxy.ejs`)
 })
+
+import apiRouter from './api';
+app.use('/api', apiRouter)
 
 const PORT = process.env.PORT || 3000; 
 app.listen(PORT, ()=>{

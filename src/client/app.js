@@ -1,38 +1,33 @@
 import React, { Component } from 'react';
-import {ActionList, Popover, Button} from '@shopify/polaris'
+import {
+  ActionList, 
+  Popover, 
+  Button,
+  FormLayout,
+  TextField,
+  TextStyle,
+  ResourceList,
+  Layout,
+  Card,
+  Thumbnail,
+} from '@shopify/polaris'
+import {ResourcePicker} from '@shopify/polaris/embedded'
+
+import NewSliderForm from './components/new-slider-form'
+import SliderList from './components/slider-list'
 
 class App extends Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      active: 0
-    }
-  }
   render() {
     return (
-      <div>
-        this is your embedded app
-        <Popover
-  active={this.state.active}
-  preferredPosition="above"
-  onClose={e=>{this.setState({active:e})}}
-  activator={<Button onClick={e => this.setState({active:1})}>Sales channels</Button>}
->
-  <Popover.Pane fixed>
-    <Popover.Section>
-      <p>Available sales channels</p>
-    </Popover.Section>
-  </Popover.Pane>
-  <Popover.Pane>
-    <ActionList
-      items={[
-        {content: 'Online store', onAction: e => {console.log(e)} },
-        {content: 'Facebook', onAction: e => {console.log(e)} },
-        {content: 'Shopify POS', onAction: e => {console.log(e)} },
-      ]}
-    />
-  </Popover.Pane>
-</Popover>
+      <div className="p-2">
+        <Layout>
+          <Layout.Section>
+            <SliderList />
+          </Layout.Section>
+          <Layout.Section>
+            <NewSliderForm />
+          </Layout.Section>
+        </Layout>
       </div>
     );
   }
