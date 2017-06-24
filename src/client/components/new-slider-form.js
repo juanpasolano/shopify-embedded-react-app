@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   ActionList, 
   Popover, 
@@ -19,32 +20,35 @@ class NewSliderForm extends Component {
     super(props);
     this.state = {
       isProductPickerOpen: false,
-      selectedProducts: [],
-      name: ''
+      products: [],
+      name: '',
     }
+  }
+  resetForm() {
+    this.setState({
+      name:'',
+      products: [],
+    })
   }
   onSubmit(e){
     e.preventDefault();
-
-    axios.post('/api/sliders', {
-      products: this.state.selectedProducts,
-      name: this.state.name
-    })
-    .then(function (response) {
-      console.log(response);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+    if(this.props.onSubmit) {
+      this.props.onSubmit({
+        products: this.state.products,
+        name: this.state.name
+      }).then(res => {
+        this.resetForm()
+      })
+    }
   }
   onProductDelete(e, product, index){
     this.setState({
-      selectedProducts: this.state.selectedProducts.filter((v, i)=> i !== index)
+      products: this.state.products.filter((v, i)=> i !== index)
     })
   }
   render() {
 
-    const resourceList = this.state.selectedProducts.map((product, index) => {
+    const resourceList = this.state.products.map((product, index) => {
       return {
         url: '#',
         media: <Thumbnail source={product.image.src} alt={product.title} />,
@@ -57,10 +61,14 @@ class NewSliderForm extends Component {
     return (
       <Card title="Create a new slider" sectioned >
         <FormLayout>
-          <TextField label="Name of slider" value={this.state.name} onChange={e => {this.setState({name: e})} } />
+          <TextField 
+            label="Name of slider *" 
+            value={this.state.name} 
+            onChange={name => {this.setState({name})} } 
+          />
 
 
-          { this.state.selectedProducts.length > 0 && <p>Selected Products</p>}
+          { this.state.products.length > 0 && <p>Selected Products</p>}
           <ResourceList
             items={resourceList}
             renderItem={(item, index) => {
@@ -68,7 +76,7 @@ class NewSliderForm extends Component {
             }}
           />
 
-          <Button onClick={()=> {this.setState({isProductPickerOpen:true})}}>Add product to the slider</Button>
+          <Button onClick={()=> {this.setState({isProductPickerOpen:true})}}>Add products</Button>
           <ResourcePicker
             products
             allowMultiple
@@ -77,7 +85,7 @@ class NewSliderForm extends Component {
               console.log('Selected products: ', resources.products);
               console.log('Selected collections: ', resources.collections);
               this.setState({isProductPickerOpen: false});
-              this.setState({selectedProducts: [...this.state.selectedProducts, ...resources.products]});
+              this.setState({products: [...this.state.products, ...resources.products]});
             }}
             onCancel={() => this.setState({isProductPickerOpen: false})}
           />
@@ -89,5 +97,10 @@ class NewSliderForm extends Component {
     );
   }
 }
+
+NewSliderForm.propTypes = {
+  onSubmit: PropTypes.func,
+};
+
 
 export default NewSliderForm;

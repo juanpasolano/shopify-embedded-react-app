@@ -16,17 +16,10 @@ const Sliders =  mongoose.model('Sliders', new Schema({
   shopName: String
 }));
 
-const Shops =  mongoose.model('Shops', new Schema({
-  shopName: String,
-  products: [String]
-}));
-
 
 const db = {
   Products,
   Sliders,
-  Shops,
-  mongoose,
 }
 
 export default db;

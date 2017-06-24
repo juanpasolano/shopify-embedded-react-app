@@ -40,28 +40,6 @@ apiRouter.route('/sliders')
         }
       })
     })
-
-    /*
-    slider.save((err, slider)=> {
-      if(err){
-        res.status(400).send(err)
-      } else {
-        const _products = (req.body.products || []).map(p => ({data:p, _slider: slider._id}))
-
-        db.Products.create(_products, (err, products)=> {
-          if(err) {
-            res.status(400).send(err)
-          } else {
-            products.forEach((product) => {
-              slider.products.push(product);
-            });
-            slider.save()
-            res.status(200).send(slider)
-          }
-        })
-      }
-    })
-    */
   })
   .get((req,res) => {
     db.Sliders
@@ -76,5 +54,16 @@ apiRouter.route('/sliders')
     })
   })
 apiRouter.route('/sliders/:slider_id')
+  .delete((req,res) => {
+    const sliderId = req.params.slider_id;
+    db.Sliders
+    .findByIdAndRemove(sliderId, (err, slider) => {
+      if(err){
+        res.status(400).send(err)
+      }else{
+        res.status(200).send(slider)
+      }
+    })
+  })
 
 export default apiRouter

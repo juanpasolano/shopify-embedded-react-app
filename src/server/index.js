@@ -8,6 +8,7 @@ import logger from 'morgan';
 import ShopifyToken from 'shopify-token';
 import Shop from './shop';
 import db from './db';
+import mongoose from 'mongoose'
 const MongoStore = require('connect-mongo')(session);
 
 //Setting up Shopify App Credentials
@@ -27,7 +28,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
-  store: new MongoStore({ mongooseConnection: db.mongoose.connection }),
+  store: new MongoStore({ mongooseConnection: mongoose.connection }),
   secret: 'keyboard cat',
   resave:false,
   saveUninitialized:false
