@@ -34,8 +34,6 @@ app.use(session({
   resave:false,
   saveUninitialized:false
 }));
-console.log('-------------------------------------------------------------')
-console.log(`${__dirname}/../public`)
 app.use(express.static(`${__dirname}/../public`))
 
 // Shopify Authentication

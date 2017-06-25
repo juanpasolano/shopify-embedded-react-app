@@ -8,7 +8,7 @@
     "start": "npm run build; mkdir src/public; npm run webpack; npm run server",
     "server": "node dist/src/server/index.js",
     "server:local": "nodemon -w src/server --exec \"babel-node src/server\"",
-    "build": "babel src/server/**/*.js -d dist && cp -R src/server/views/* dist/src/server/views",
+    "build": "babel src/server/**/*.js -d dist && cp -R src/server/views/* dist/src/server/views && cp -R src/public/* dist/src/public/",
     "webpack:watch": "webpack -d --watch -p --progress",
     "webpack": "webpack -d -p --progress",
     "dev": "npm run server; npm run webpack:watch"
