@@ -36,7 +36,7 @@
     loadStyle("//cdn.jsdelivr.net/jquery.slick/1.6.0/slick.css")
     loadScript("//cdn.jsdelivr.net/jquery.slick/1.6.0/slick.min.js", function(){
       $.fn.slick = window.jQuery.fn.slick;
-      if(sliders){
+      if(sliders.length){
         var $el = $(handler);
         var sliderId = $el.attr('data-slider-id');
         var slider = (sliderId) ? sliders.find(function(s){return s._id === sliderId}) : sliders[0]
