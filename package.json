@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run build; mkdir src/public; npm run webpack; cp -R src/public/* dist/src/public/; npm run server",
+    "start": "npm run build; mkdir src/public; mkdir dist/src/public; npm run webpack; cp -R src/public/* dist/src/public/; npm run server",
     "server": "node dist/src/server/index.js",
     "server:local": "nodemon -w src/server --exec \"babel-node src/server\"",
     "build": "babel src/server/**/*.js -d dist && cp -R src/server/views/* dist/src/server/views",
