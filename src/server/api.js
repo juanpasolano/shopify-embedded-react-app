@@ -41,8 +41,9 @@ apiRouter.route('/sliders')
     })
   })
   .get((req,res) => {
+    const requestedShop = (req.query.shopName) ? req.query.shopName : req.session.shopName
     db.Sliders
-    .find({shopName:req.session.shopName})
+    .find({shopName:requestedShop})
     .populate('products')
     .exec((err, sliders) => {
       if(err){

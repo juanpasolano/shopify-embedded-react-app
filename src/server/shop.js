@@ -20,10 +20,10 @@ function Shop(shopName, token) {
         .catch(err => console.error(err));
     }
   }
-  this.addScriptTag = () => {
+  this.addScriptTag = (sriptName) => {
     return this.shopify.scriptTag.create({ 
       event: "onload",
-      src: `${process.env.BASE_URL}scriptTag.js`
+      src: `${process.env.BASE_URL}${sriptName}`
     }).then(res => console.log(res))
       .catch(err => console.error(err));
   }

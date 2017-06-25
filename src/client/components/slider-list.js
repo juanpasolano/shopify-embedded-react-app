@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {
   Card,
   ResourceList,
+  TextStyle,
 } from '@shopify/polaris'
 
 
@@ -12,6 +13,7 @@ class SliderList extends Component {
       return {
         attributeOne: slider.name,
         attributeTwo: slider.products.length + ' products',
+        attributeThree: <TextStyle variation="subdued">{slider._id}</TextStyle>,
         actions: [{content: 'Delete', onAction: e => {this.props.onDelete(e, slider, index)}}],
         persistActions: true,
       }

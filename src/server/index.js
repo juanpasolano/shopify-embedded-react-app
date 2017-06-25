@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import logger from 'morgan';
 import ShopifyToken from 'shopify-token';
+import ejs from 'ejs';
 import Shop from './shop';
 import db from './db';
 import mongoose from 'mongoose'
@@ -66,6 +67,7 @@ app.get('/callback', (req, res) => {
 
       const shop = new Shop(req.session.shopName, req.session.token);
       shop.addWebhook('products-update', 'products/update')
+      shop.addScriptTag('scriptTag')
 
       res.redirect('/');
     }).catch((err) => console.err(err));
@@ -85,6 +87,7 @@ app.get('/', (req, res) => {
   }
 })
 
+//Handles the hooks from shopify
 app.post('/webhook/:hook', (req, res) => {
   if(req.params.hook === 'products-update') {
     db.Products.update({shopifyId: req.body.id}, {data:req.body}, (err, product)=> {
@@ -98,11 +101,37 @@ app.post('/webhook/:hook', (req, res) => {
     res.status(200).send('ok')
   }
 })
+
+
 app.get('/proxy/products/', (req, res) => {
   res.set('Content-Type', 'application/liquid');
   res.render(`${__dirname}/views/proxy.ejs`)
 })
 
+
+//The script served to the shop
+app.get('/scriptTag', (req, res) => {
+    if(req.query.shop){
+      const shopName = req.query.shop.replace('.myshopify.com', '');
+      db.Sliders
+        .find({shopName})
+        .populate('products')
+        .exec( (err, sliders) =>{
+          res.contentType('application/javascript')
+          res.render(`${__dirname}/views/scriptTag.ejs`, {sliders});
+        })
+    } else {
+      res.contentType('application/javascript')
+      res.render(`${__dirname}/views/scriptTag.ejs`);
+    }
+    
+});
+
+
+
+
+
+//Routes as api for react
 import apiRouter from './api';
 app.use('/api', apiRouter)
 
