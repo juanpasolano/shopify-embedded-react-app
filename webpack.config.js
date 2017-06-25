@@ -10,6 +10,7 @@ module.exports = {
       'react-dom',
       'react-router-dom',
       '@shopify/polaris',
+      '@shopify/polaris/embedded',
       'axios',
     ]
   },

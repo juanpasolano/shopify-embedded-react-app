@@ -1,5 +1,5 @@
 @mixin spacer-loop($sufix: "") {
-  @for $i from 0 through 20 {
+  @for $i from 0 through 5 {
     .spacer-#{$i}#{$sufix} {
       width: 100%;
       clear: both;
