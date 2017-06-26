@@ -28,6 +28,10 @@ var _shopifyToken = require('shopify-token');
 
 var _shopifyToken2 = _interopRequireDefault(_shopifyToken);
 
+var _ejs = require('ejs');
+
+var _ejs2 = _interopRequireDefault(_ejs);
+
 var _shop = require('./shop');
 
 var _shop2 = _interopRequireDefault(_shop);
@@ -36,9 +40,9 @@ var _db = require('./db');
 
 var _db2 = _interopRequireDefault(_db);
 
-var _shopifyApiNode = require('shopify-api-node');
+var _mongoose = require('mongoose');
 
-var _shopifyApiNode2 = _interopRequireDefault(_shopifyApiNode);
+var _mongoose2 = _interopRequireDefault(_mongoose);
 
 var _api = require('./api');
 
@@ -66,21 +70,21 @@ app.use(_bodyParser2.default.json());
 app.use(_bodyParser2.default.urlencoded({ extended: false }));
 app.use((0, _cookieParser2.default)());
 app.use((0, _expressSession2.default)({
-  store: new MongoStore({ mongooseConnection: _db2.default.mongoose.connection }),
+  store: new MongoStore({ mongooseConnection: _mongoose2.default.connection }),
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: false
 }));
-app.use(_express2.default.static(__dirname + '/../public')
+app.use(_express2.default.static(__dirname + '/../public'));
 
 // Shopify Authentication
-);app.get('/install', function (req, res) {
+app.get('/install', function (req, res) {
   res.render(__dirname + '/views/install.ejs');
-}
+});
 
 // This function initializes the Shopify OAuth Process
 // The template in views/embedded_app_redirect.ejs is rendered 
-);app.get('/shopify_auth', function (req, res) {
+app.get('/shopify_auth', function (req, res) {
   var shop = req.query.shop;
   if (shop) {
     req.session.shopName = shop;
@@ -91,57 +95,31 @@ app.use(_express2.default.static(__dirname + '/../public')
   } else {
     res.status(400).send('Bad request: No shop param specified');
   }
-}
+});
 
 // After the users clicks 'Install' on the Shopify website, they are redirected here
 // Shopify provides the app the is authorization_code, which is exchanged for an access token
-);app.get('/callback', function (req, res) {
+app.get('/callback', function (req, res) {
   var verified = shopifyToken.verifyHmac(req.query);
   if (verified) {
     shopifyToken.getAccessToken(req.query.shop, req.query.code).then(function (token) {
-      console.log('lets get the token');
       req.session.token = token;
 
       var shop = new _shop2.default(req.session.shopName, req.session.token);
-      shop.addWebhook('/products-changes', 'products/create, products/delete, products/update');
+      shop.addWebhook('products-update', 'products/update');
+      shop.addScriptTag('scriptTag');
 
       res.redirect('/');
     }).catch(function (err) {
       return console.err(err);
     });
   }
-}
+});
 
 // React
 //The react app handles the rest of the urls
-);
 app.get('/', function (req, res) {
   if (req.session.token) {
-
-    //const shop = new Shop(req.session.shopName, req.session.token);
-    //shop.addWebhook('/products-changes', 'products/create, products/delete, products/update')
-
-    console.log(req.session);
-    var shopify = new _shopifyApiNode2.default({
-      shopName: req.session.shopName,
-      accessToken: req.session.token
-    });
-
-    if (process.env.BASE_URL) {
-      var address = process.env.BASE_URL + 'webhook//products-changes';
-      shopify.webhook.create({
-        "webhook": {
-          "topic": "orders/create",
-          "address": "http://whatever.hostname.com/",
-          "format": "json"
-        }
-      }).then(function (res) {
-        return console.log(res);
-      }).catch(function (err) {
-        return console.error(err);
-      });
-    }
-
     res.render(__dirname + '/views/index.ejs', {
       apiKey: process.env.SHOPIFY_APP_API_KEY,
       shopName: req.session.shopName
@@ -151,16 +129,41 @@ app.get('/', function (req, res) {
   }
 });
 
+//Handles the hooks from shopify
 app.post('/webhook/:hook', function (req, res) {
-  console.log(req.body);
-  res.status(200).send('ok');
+  if (req.params.hook === 'products-update') {
+    _db2.default.Products.update({ shopifyId: req.body.id }, { data: req.body }, function (err, product) {
+      if (err) {
+        res.status(400).send('ok');
+      } else {
+        res.status(200).send(product);
+      }
+    });
+  } else {
+    res.status(200).send('ok');
+  }
 });
 
 app.get('/proxy/products/', function (req, res) {
-  console.log(req.session);
   res.set('Content-Type', 'application/liquid');
   res.render(__dirname + '/views/proxy.ejs');
 });
+
+//The script served to the shop
+app.get('/scriptTag', function (req, res) {
+  if (req.query.shop) {
+    var shopName = req.query.shop.replace('.myshopify.com', '');
+    _db2.default.Sliders.find({ shopName: shopName }).populate('products').exec(function (err, sliders) {
+      res.contentType('application/javascript');
+      res.render(__dirname + '/views/scriptTag.ejs', { sliders: sliders });
+    });
+  } else {
+    res.contentType('application/javascript');
+    res.render(__dirname + '/views/scriptTag.ejs');
+  }
+});
+
+//Routes as api for react
 
 app.use('/api', _api2.default);
 

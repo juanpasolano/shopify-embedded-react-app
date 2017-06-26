@@ -32,8 +32,7 @@ apiRouter.route('/sliders').post(function (req, res) {
         //createit
         var newProduct = new _db2.default.Products({
           data: product,
-          shopifyId: product.id,
-          _slider: slider._id
+          shopifyId: product.id
         });
         newProduct.save();
         slider.products.push(newProduct);
@@ -52,31 +51,10 @@ apiRouter.route('/sliders').post(function (req, res) {
         res.status(200).send(slider);
       }
     });
-  }
-
-  /*
-  slider.save((err, slider)=> {
-    if(err){
-      res.status(400).send(err)
-    } else {
-      const _products = (req.body.products || []).map(p => ({data:p, _slider: slider._id}))
-       db.Products.create(_products, (err, products)=> {
-        if(err) {
-          res.status(400).send(err)
-        } else {
-          products.forEach((product) => {
-            slider.products.push(product);
-          });
-          slider.save()
-          res.status(200).send(slider)
-        }
-      })
-    }
-  })
-  */
-  );
+  });
 }).get(function (req, res) {
-  _db2.default.Sliders.find({ shopName: req.session.shopName }).populate('products').exec(function (err, sliders) {
+  var requestedShop = req.query.shopName ? req.query.shopName : req.session.shopName;
+  _db2.default.Sliders.find({ shopName: requestedShop }).populate('products').exec(function (err, sliders) {
     if (err) {
       res.status(400).send(err);
     } else {
@@ -84,6 +62,15 @@ apiRouter.route('/sliders').post(function (req, res) {
     }
   });
 });
-apiRouter.route('/sliders/:slider_id');
+apiRouter.route('/sliders/:slider_id').delete(function (req, res) {
+  var sliderId = req.params.slider_id;
+  _db2.default.Sliders.findByIdAndRemove(sliderId, function (err, slider) {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(200).send(slider);
+    }
+  });
+});
 
 exports.default = apiRouter;

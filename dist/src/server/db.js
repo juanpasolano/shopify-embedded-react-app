@@ -16,8 +16,7 @@ _mongoose2.default.connect(mongoDb);
 
 var Products = _mongoose2.default.model('Products', new _mongoose.Schema({
   shopifyId: String,
-  data: _mongoose.Schema.Types.Mixed,
-  _slider: { type: _mongoose.Schema.Types.ObjectId, ref: 'Sliders' }
+  data: _mongoose.Schema.Types.Mixed
 }));
 
 var Sliders = _mongoose2.default.model('Sliders', new _mongoose.Schema({
@@ -26,16 +25,9 @@ var Sliders = _mongoose2.default.model('Sliders', new _mongoose.Schema({
   shopName: String
 }));
 
-var Shops = _mongoose2.default.model('Shops', new _mongoose.Schema({
-  shopName: String,
-  products: [String]
-}));
-
 var db = {
   Products: Products,
-  Sliders: Sliders,
-  Shops: Shops,
-  mongoose: _mongoose2.default
+  Sliders: Sliders
 };
 
 exports.default = db;

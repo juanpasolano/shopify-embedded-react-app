@@ -35,10 +35,10 @@ function Shop(shopName, token) {
       });
     }
   };
-  this.addScriptTag = function () {
+  this.addScriptTag = function (sriptName) {
     return _this.shopify.scriptTag.create({
       event: "onload",
-      src: process.env.BASE_URL + "scriptTag.js"
+      src: "" + process.env.BASE_URL + sriptName
     }).then(function (res) {
       return console.log(res);
     }).catch(function (err) {
