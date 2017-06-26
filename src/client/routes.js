@@ -7,7 +7,7 @@ class Routes extends Component {
   render() {
     return (
       <BrowserRouter >
-        <EmbeddedApp {...window.shopSession} forceRedirect={false}>
+        <EmbeddedApp {...window.shopSession} forceRedirect={true}>
           <div>
             <Route exact path='/' component={App} />
           </div>
